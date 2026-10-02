@@ -1,12 +1,12 @@
 import os
 import sys
 
-from data import STDOUT_FILENO
+from data import STDOUT_FILENO, E
 
 sys.dont_write_bytecode = True
 
 def editor_draw_rows() -> None:
-    for y in range(24):
+    for y in range(E.screenrows):
         os.write(STDOUT_FILENO, b'~\r\n'[:3])
 
 def editor_refresh_screen() -> None:

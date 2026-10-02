@@ -7,12 +7,21 @@ import sys
 
 sys.dont_write_bytecode = True
 
-from terminal import enable_raw_mode
+from terminal import enable_raw_mode, get_window_size
 from input import editor_process_keypress
 from output import editor_refresh_screen
+from data import E
+
+def init_editor() -> None:
+    try:
+        #E.screenrows, E.screencols = get_window_size(E)#E.screenrows, E.screencols)
+        get_window_size(E)#E.screenrows, E.screencols)
+    except OSError:
+        die("get_window_error")
 
 def main():
     enable_raw_mode()
+    init_editor()
 
     while True:
         editor_refresh_screen()

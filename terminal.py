@@ -4,8 +4,9 @@ from dataclasses import dataclass, field, astuple, replace
 import termios
 import atexit
 import errno
+import fcntl
+import array
 
-#from data import TtyAttributes, STDIN_FILENO, perror, orig_termios
 from data import *
 
 sys.dont_write_bytecode = True
@@ -17,10 +18,8 @@ def die(s: str) -> None:
     perror(s)
     sys.exit(1)
 
-#def disable_raw_mode(tty_attributes: TtyAttributes) -> None:
 def disable_raw_mode() -> None:
     try:
-        #termios.tcsetattr(STDIN_FILENO, termios.TCSAFLUSH, list(astuple(tty_attributes.orig_termios)))
         termios.tcsetattr(STDIN_FILENO, termios.TCSAFLUSH, list(astuple(E.orig_termios)))
     except termios.error:
         die("tcsetattr")
@@ -31,7 +30,6 @@ def enable_raw_mode() -> None:
     except termios.error:
         die("tcgetattr")
 
-    #atexit.register(disable_raw_mode, orig_termios)
     atexit.register(disable_raw_mode)
 
     raw = replace(E.orig_termios)
@@ -58,3 +56,17 @@ def editor_read_key() -> bytes:
         except OSError as e:
             if e.errno != errno.EAGAIN:
                 die("read")
+
+def get_window_size(config: EditorConfig) -> None:#rows: int, cols: int): # This function can be errased with size = shutil.get_terminal_size()
+    ws_bytes = array.array('H', [4, 4, 4, 4])
+    try:
+        fcntl.ioctl(STDOUT_FILENO, termios.TIOCGWINSZ, ws_bytes)
+        ws = Winsize(*ws_bytes)
+    except OSError as c:
+        sys.exit(-1)
+
+    if ws.ws_col == 0:
+        sys.exit(-1)
+    else:
+        config.screencols = ws.ws_col
+        config.screenrows = ws.ws_rows

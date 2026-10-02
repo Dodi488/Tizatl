@@ -34,6 +34,16 @@ class TtyAttributes:
 @dataclass
 class EditConfig:
     orig_termios: TtyAttributes
+    screenrows: int = 24
+    screencols: int = 0
+    #orig_termios: TtyAttributes
+
+@dataclass
+class Winsize:
+    ws_rows: int
+    ws_col: int
+    ws_xpixel: int
+    ws_ypixel: int
 
 STDIN_FILENO = sys.stdin.fileno()
 STDOUT_FILENO = sys.stdout.fileno()
