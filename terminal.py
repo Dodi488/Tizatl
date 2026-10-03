@@ -6,6 +6,7 @@ import atexit
 import errno
 import fcntl
 import array
+#import tuple
 
 from data import *
 
@@ -57,16 +58,60 @@ def editor_read_key() -> bytes:
             if e.errno != errno.EAGAIN:
                 die("read")
 
-def get_window_size(config: EditorConfig) -> None:#rows: int, cols: int): # This function can be errased with size = shutil.get_terminal_size()
+def get_cursor_position() -> tuple(int, int):
+    buf = [b'\x00'] * 32
+    i = 0
+
+    if os.write(STDOUT_FILENO, b'\x1b[6n'[:4]) != 4:
+        return -1, -1
+
+    while (i < (len(buf) - 1)):
+        c = os.read(STDIN_FILENO, 1)
+
+        if not c:
+            break
+
+        if c == b'R':
+            break
+
+        buf[i] = c
+        i += 1
+
+    buf[i] = b'\x00'
+
+    if (buf[0] != b'\x1b' or buf[1] != b'['):
+        return -1, -1
+
+    buf = b''.join(buf[2:]).replace(b'\x00', b'').decode('ascii')
+    sizes = buf.split(";")
+    if len(sizes) != 2:
+        return -1, -1
+    else:
+        return int(sizes[0]), int(sizes[1])
+
+def get_window_size(config: EditorConfig) -> int: # This function can be errased with size = shutil.get_terminal_size()
     ws_bytes = array.array('H', [4, 4, 4, 4])
+
     try:
         fcntl.ioctl(STDOUT_FILENO, termios.TIOCGWINSZ, ws_bytes)
         ws = Winsize(*ws_bytes)
-    except OSError as c:
-        sys.exit(-1)
 
-    if ws.ws_col == 0:
-        sys.exit(-1)
-    else:
-        config.screencols = ws.ws_col
-        config.screenrows = ws.ws_rows
+        if ws.ws_col == 0:
+            raise OSError
+
+    except:
+        if ((c := os.write(STDOUT_FILENO, b'\x1b[999C\x1b[999B'[:12])) != 12):
+            return -1
+
+        if ws.ws_col == 0:
+            return -1
+
+        position = get_cursor_position()
+        if position == (-1, -1):
+            return -1
+
+        config.screenrows, config.screencols = position
+        return 0
+
+    config.screencols = ws.ws_col
+    config.screenrows = ws.ws_rows
