@@ -13,9 +13,11 @@ from output import editor_refresh_screen
 from data import E
 
 def init_editor() -> None:
+    E.cx = 0
+    E.cy = 0
+
     try:
-        #E.screenrows, E.screencols = get_window_size(E)#E.screenrows, E.screencols)
-        get_window_size(E)#E.screenrows, E.screencols)
+        get_window_size(E)
     except OSError:
         die("get_window_error")
 

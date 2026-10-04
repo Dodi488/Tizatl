@@ -34,9 +34,10 @@ class TtyAttributes:
 @dataclass
 class EditConfig:
     orig_termios: TtyAttributes
-    screenrows: int = 24
+    cx: int = 0
+    cy: int = 0
+    screenrows: int = 0
     screencols: int = 0
-    #orig_termios: TtyAttributes
 
 @dataclass
 class Winsize:
@@ -47,6 +48,7 @@ class Winsize:
 
 STDIN_FILENO = sys.stdin.fileno()
 STDOUT_FILENO = sys.stdout.fileno()
+TIZATL_VERSION = "0.0.1"
 
 def CTRL_KEY(k):
     return ord(k) & 0x1f
