@@ -8,22 +8,28 @@ sys.dont_write_bytecode = True
 
 def editor_draw_rows(ab: Abuf) -> None:
     for y in range(E.screenrows):
-        if (y == E.screenrows / 3):
-            welcome = f"Tizatl editor -- version {TIZATL_VERSION}"
-            welcomelen = len(welcome)
-            if (welcomelen > E.screencols): welcomelen = E.screencols
-            padding = (E.screencols - welcomelen) / 2
-            if padding:
+        if (y >= E.numrows):
+            if (y == E.screenrows / 3):
+                welcome = f"Tizatl editor -- version {TIZATL_VERSION}"
+                welcomelen = len(welcome)
+                if (welcomelen > E.screencols): welcomelen = E.screencols
+                padding = (E.screencols - welcomelen) / 2
+                if padding:
+                    ab_append(ab, "~", 1)
+                    padding -= 1
+    
+                while padding != 0:
+                    ab_append(ab, " ", 1)
+                    padding -= 1
+                ab_append(ab, welcome, welcomelen)
+            else:
                 ab_append(ab, "~", 1)
-                padding -= 1
 
-            while padding != 0:
-                ab_append(ab, " ", 1)
-                padding -= 1
-            ab_append(ab, welcome, welcomelen)
         else:
-            ab_append(ab, "~", 1)
-
+            length = E.row.size
+            if length > E.screencols: length = E.screencols
+            ab_append(ab, E.row.chars, length)
+            
         ab_append(ab, "\x1b[K", 3)
         if (y < E.screenrows - 1):
             ab_append(ab, "\r\n", 2)

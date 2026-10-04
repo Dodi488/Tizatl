@@ -11,10 +11,12 @@ from terminal import enable_raw_mode, get_window_size
 from input import editor_process_keypress
 from output import editor_refresh_screen
 from data import E
+from file_io import editor_open
 
 def init_editor() -> None:
     E.cx = 0
     E.cy = 0
+    E.numrows = 0
 
     try:
         get_window_size(E)
@@ -24,6 +26,8 @@ def init_editor() -> None:
 def main():
     enable_raw_mode()
     init_editor()
+    if len(sys.argv) >= 2:
+        editor_open(sys.argv[1])
 
     while True:
         editor_refresh_screen()

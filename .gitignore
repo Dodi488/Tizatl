@@ -1,7 +1,6 @@
 test.c
 test
 defines.py
-file_io.py
 find.py
 editor_operations.py
 filetype.py
@@ -9,4 +8,5 @@ prototype.py
 row_operations.py
 test45.c
 test45
-prueba.py
+old_prueba.py
+test.txt

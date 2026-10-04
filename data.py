@@ -33,12 +33,19 @@ class TtyAttributes:
     cc: list[str | int] = field(default_factory=list)
 
 @dataclass
+class Erow:
+    size: int
+    chars: str
+
+@dataclass
 class EditConfig:
     orig_termios: TtyAttributes
+    row: Erow
     cx: int = 0
     cy: int = 0
     screenrows: int = 0
     screencols: int = 0
+    numrows: int = 0
 
 @dataclass
 class Winsize:
@@ -55,7 +62,8 @@ def CTRL_KEY(k):
     return ord(k) & 0x1f
 
 #orig_termios = TtyAttributes(*termios.tcgetattr(STDIN_FILENO))
-E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
+row_init_data = [0, " "]
+E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)), row=Erow(*row_init_data))
 
 class EditorKey(Enum):
     MOVE_LEFT = b'h'
