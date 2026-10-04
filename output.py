@@ -36,7 +36,9 @@ def editor_refresh_screen() -> None:
 
     editor_draw_rows(ab)
 
-    ab_append(ab, "\x1b[H", 3)
+    buf = f"\x1b[{E.cy + 1};{E.cx + 1}H"
+    ab_append(ab, buf, len(buf))
+
     ab_append(ab, "\x1b[?25h", 6)
 
     os.write(STDOUT_FILENO, ab.b[:ab.length])

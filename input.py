@@ -4,13 +4,44 @@ import os
 sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
-from data import CTRL_KEY, STDOUT_FILENO
+from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey
 
 sys.dont_write_bytecode = True
 
+def editor_move_cursor(key: bytes) -> None:
+    match key:
+        case EditorKey.MOVE_LEFT.value:
+            if E.cx != 0:
+                E.cx -= 1
+        case EditorKey.MOVE_RIGHT.value:
+            if E.cx != E.screencols - 1:
+                E.cx += 1
+        case EditorKey.MOVE_UP.value:
+            if E.cy != 0:
+                E.cy -= 1
+        case EditorKey.MOVE_DOWN.value:
+            if E.cy != E.screenrows - 1:
+                E.cy += 1
+
 def editor_process_keypress() -> None:
     c = editor_read_key()
-    if c and c[0] == CTRL_KEY('q'):
-        os.write(STDOUT_FILENO, b'\x1b[2J'[:4])
-        os.write(STDOUT_FILENO, b'\x1b[H'[:3])
-        sys.exit(0)
+    if c:
+        if c[0] == CTRL_KEY('q'):
+            os.write(STDOUT_FILENO, b'\x1b[2J'[:4])
+            os.write(STDOUT_FILENO, b'\x1b[H'[:3])
+            sys.exit(0)
+
+        if c == EditorKey.HOME_KEY.value:
+            E.cx = 0
+
+        if c == EditorKey.END_KEY.value:
+            E.cx = E.screencols - 1
+
+        if c == EditorKey.PAGE_UP.value or c == EditorKey.PAGE_DOWN.value:
+            times = E.screenrows
+            while times != 0:
+                editor_move_cursor(EditorKey.MOVE_UP.value if c == EditorKey.PAGE_UP.value else EditorKey.MOVE_DOWN.value)
+                times -= 1
+
+        if c in EditorKey:
+            editor_move_cursor(c)

@@ -1,6 +1,7 @@
 import sys
 from dataclasses import dataclass, field, astuple, replace
 import termios
+from enum import Enum
 
 sys.dont_write_bytecode = True
 
@@ -55,3 +56,14 @@ def CTRL_KEY(k):
 
 #orig_termios = TtyAttributes(*termios.tcgetattr(STDIN_FILENO))
 E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
+
+class EditorKey(Enum):
+    MOVE_LEFT = b'h'
+    MOVE_RIGHT = b'l'
+    MOVE_UP = b'k'
+    MOVE_DOWN = b'j'
+    HOME_KEY = b'\x1b[1~'
+    DEL_KEY = b'\x1b[3~'
+    END_KEY = b'\x1b[4~'
+    PAGE_UP = b'\x1b[5~'
+    PAGE_DOWN = b'\x1b[6~'

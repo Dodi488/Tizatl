@@ -1,2 +1,2 @@
-# simple_text_editor
+# Tizatl
 Simple text editor writen in Python.

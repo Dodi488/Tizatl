@@ -49,14 +49,60 @@ def enable_raw_mode() -> None:
     # We are going to define a class and alter its values.
 
 def editor_read_key() -> bytes:
+#def editor_read_key() -> int:
     while True:
         try:
             c = os.read(STDIN_FILENO, 1)
             if c:
-                return c
+                break
         except OSError as e:
             if e.errno != errno.EAGAIN:
                 die("read")
+
+    if (c == b'\x1b'):
+        seq = [b'0'] * 3
+
+        try:
+            seq[0] = os.read(STDIN_FILENO, 1)
+        except OSError:
+            return b'\x1b'
+
+        try:
+            seq[1] = os.read(STDIN_FILENO, 1)
+        except OSError:
+            return b'\x1b'
+
+        if seq[0] == b'[':
+            if seq[1] >= b'0' and seq[1] <= b'9':
+                try:
+                    seq[2] = os.read(STDIN_FILENO, 1)
+                except OSError:
+                    return b'\x1b'
+                if seq[2] == b'~':
+                    match seq[1]:
+                        case b'1': return EditorKey.HOME_KEY.value
+                        case b'3': return EditorKey.DEL_KEY.value
+                        case b'4': return EditorKey.END_KEY.value
+                        case b'5': return EditorKey.PAGE_UP.value
+                        case b'6': return EditorKey.PAGE_DOWN.value
+                        case b'7': return EditorKey.HOME_KEY.value
+                        case b'8': return EditorKey.END_KEY.value
+            else:
+                match seq[1]:
+                    case b'A': return EditorKey.MOVE_UP.value
+                    case b'B': return EditorKey.MOVE_DOWN.value
+                    case b'C': return EditorKey.MOVE_RIGHT.value
+                    case b'D': return EditorKey.MOVE_LEFT.value
+                    case b'H': return EditorKey.HOME_KEY.value
+                    case b'F': return EditorKey.END_KEY.value
+                    case _: return b'\x1b'
+
+        elif seq[0] == b'O':
+            match seq[1]:
+                case b'H': return EditorKey.HOME_KEY.value
+                case b'F': return EditorKey.END_KEY.value
+
+    return c
 
 def get_cursor_position() -> tuple(int, int):
     buf = [b'\x00'] * 32
