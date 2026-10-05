@@ -4,18 +4,21 @@ import os
 sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
-from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey
+from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow
 
 sys.dont_write_bytecode = True
 
 def editor_move_cursor(key: bytes) -> None:
+    #False if E.cy >= E.numrows else E.row[:E.cy]
+    row = None if E.cy >= E.numrows else E.row[E.cy]
+
     match key:
         case EditorKey.MOVE_LEFT.value:
             if E.cx != 0:
                 E.cx -= 1
         case EditorKey.MOVE_RIGHT.value:
-            #if E.cx != E.screencols - 1:
-            E.cx += 1
+            if (row and E.cx <= row.size):
+                E.cx += 1
         case EditorKey.MOVE_UP.value:
             if E.cy != 0:
                 E.cy -= 1
