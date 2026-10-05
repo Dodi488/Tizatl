@@ -14,13 +14,13 @@ def editor_move_cursor(key: bytes) -> None:
             if E.cx != 0:
                 E.cx -= 1
         case EditorKey.MOVE_RIGHT.value:
-            if E.cx != E.screencols - 1:
-                E.cx += 1
+            #if E.cx != E.screencols - 1:
+            E.cx += 1
         case EditorKey.MOVE_UP.value:
             if E.cy != 0:
                 E.cy -= 1
         case EditorKey.MOVE_DOWN.value:
-            if E.cy != E.screenrows - 1:
+            if E.cy != E.numrows:
                 E.cy += 1
 
 def editor_process_keypress() -> None:

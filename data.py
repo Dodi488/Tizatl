@@ -48,10 +48,11 @@ class Erow:
 @dataclass
 class EditConfig:
     orig_termios: TtyAttributes
-    #row: Erow
     row: list[Erow] = field(default_factory=list)
     cx: int = 0
     cy: int = 0
+    rowoff: int = 0
+    coloff: int = 0
     screenrows: int = 0
     screencols: int = 0
     numrows: int = 0

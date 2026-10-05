@@ -16,10 +16,9 @@ from file_io import editor_open
 def init_editor() -> None:
     E.cx = 0
     E.cy = 0
+    E.rowoff = 0
+    E.coloff = 0
     E.numrows = 0
-    #E.row = None
-    #E.row = ""
-    #E.row = bytearray()
     E.row = []
 
     try:
