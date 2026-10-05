@@ -49,7 +49,6 @@ def enable_raw_mode() -> None:
     # We are going to define a class and alter its values.
 
 def editor_read_key() -> bytes:
-#def editor_read_key() -> int:
     while True:
         try:
             c = os.read(STDIN_FILENO, 1)

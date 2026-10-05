@@ -22,6 +22,14 @@ def perror(s: str): # Python automatically halts the program when it encounters 
     else:
         print(s, file=sys.stderr)
 
+def realloc(b: bytearray, length: int) -> bytearray: # bytearray.resize()
+    if len(b) == length:
+        return b
+    elif len(b) > length:
+        return b[:length]
+    elif len(b) < length:
+        return b + bytearray(length)
+
 @dataclass
 class TtyAttributes:
     iflag: int
@@ -40,7 +48,8 @@ class Erow:
 @dataclass
 class EditConfig:
     orig_termios: TtyAttributes
-    row: Erow
+    #row: Erow
+    row: list[Erow] = field(default_factory=list)
     cx: int = 0
     cy: int = 0
     screenrows: int = 0
@@ -62,8 +71,8 @@ def CTRL_KEY(k):
     return ord(k) & 0x1f
 
 #orig_termios = TtyAttributes(*termios.tcgetattr(STDIN_FILENO))
-row_init_data = [0, " "]
-E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)), row=Erow(*row_init_data))
+#row_init_data = [0, " "]
+E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
 
 class EditorKey(Enum):
     MOVE_LEFT = b'h'

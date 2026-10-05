@@ -7,7 +7,7 @@ import sys
 
 sys.dont_write_bytecode = True
 
-from terminal import enable_raw_mode, get_window_size
+from terminal import enable_raw_mode, get_window_size, die
 from input import editor_process_keypress
 from output import editor_refresh_screen
 from data import E
@@ -17,6 +17,10 @@ def init_editor() -> None:
     E.cx = 0
     E.cy = 0
     E.numrows = 0
+    #E.row = None
+    #E.row = ""
+    #E.row = bytearray()
+    E.row = []
 
     try:
         get_window_size(E)
