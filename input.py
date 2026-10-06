@@ -9,22 +9,31 @@ from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow
 sys.dont_write_bytecode = True
 
 def editor_move_cursor(key: bytes) -> None:
-    #False if E.cy >= E.numrows else E.row[:E.cy]
     row = None if E.cy >= E.numrows else E.row[E.cy]
 
     match key:
         case EditorKey.MOVE_LEFT.value:
             if E.cx != 0:
                 E.cx -= 1
+            elif E.cy > 0:
+                E.cy -= 1
+                E.cx = E.row[E.cy].size
         case EditorKey.MOVE_RIGHT.value:
-            if (row and E.cx <= row.size):
+            if (row and E.cx < row.size):
                 E.cx += 1
+            elif (row and E.cx == row.size):
+                E.cy += 1
+                E.cx = 0
         case EditorKey.MOVE_UP.value:
             if E.cy != 0:
                 E.cy -= 1
         case EditorKey.MOVE_DOWN.value:
             if E.cy != E.numrows:
                 E.cy += 1
+
+    row = None if E.cy >= E.numrows else E.row[E.cy]
+    rowlen = row.size if row else 0
+    if E.cx > rowlen: E.cx = rowlen
 
 def editor_process_keypress() -> None:
     c = editor_read_key()

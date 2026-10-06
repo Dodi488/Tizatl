@@ -1,6 +1,6 @@
 import sys
 from dataclasses import dataclass, field
-from typing import Any
+#from typing import Any
 
 from data import realloc
 
@@ -11,7 +11,7 @@ class Abuf:
     b: bytearray = field(default_factory=bytearray) # This is not necessary because in Python strings are dynamic or we could use an numpy array (np.zeros).
     length: int = 0
 
-def ab_append(ab: Abuf, s: str, length: int) -> Any:
+def ab_append(ab: Abuf, s: str, length: int) -> None:
     new = realloc(ab.b, ab.length + length)
 
     if (new == None): return
@@ -19,5 +19,5 @@ def ab_append(ab: Abuf, s: str, length: int) -> Any:
     ab.b = new
     ab.length += length
 
-def ab_free(ab: Abuf) -> Any:
+def ab_free(ab: Abuf) -> None:
     ab.b = bytearray()

@@ -43,7 +43,10 @@ class TtyAttributes:
 @dataclass
 class Erow:
     size: int
+    rsize: int
     chars: str
+    #render: list[str] = field(default_factory=list)
+    render: str
 
 @dataclass
 class EditConfig:
@@ -51,6 +54,7 @@ class EditConfig:
     row: list[Erow] = field(default_factory=list)
     cx: int = 0
     cy: int = 0
+    rx: int = 0
     rowoff: int = 0
     coloff: int = 0
     screenrows: int = 0
@@ -67,6 +71,7 @@ class Winsize:
 STDIN_FILENO = sys.stdin.fileno()
 STDOUT_FILENO = sys.stdout.fileno()
 TIZATL_VERSION = "0.0.1"
+TAB_STOP_SIZE = 4
 
 def CTRL_KEY(k):
     return ord(k) & 0x1f
