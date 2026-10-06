@@ -103,7 +103,7 @@ def editor_read_key() -> bytes:
 
     return c
 
-def get_cursor_position() -> tuple(int, int):
+def get_cursor_position() -> tuple[int, int]:
     buf = [b'\x00'] * 32
     i = 0
 
@@ -134,7 +134,7 @@ def get_cursor_position() -> tuple(int, int):
     else:
         return int(sizes[0]), int(sizes[1])
 
-def get_window_size(config: EditorConfig) -> int: # This function can be errased with size = shutil.get_terminal_size()
+def get_window_size(config: EditConfig) -> int: # This function can be errased with size = shutil.get_terminal_size()
     ws_bytes = array.array('H', [4, 4, 4, 4])
 
     try:

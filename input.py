@@ -47,9 +47,16 @@ def editor_process_keypress() -> None:
             E.cx = 0
 
         if c == EditorKey.END_KEY.value:
-            E.cx = E.screencols - 1
+            if E.cy < E.numrows:
+                E.cx = E.row[E.cy].size
 
         if c == EditorKey.PAGE_UP.value or c == EditorKey.PAGE_DOWN.value:
+            if c == EditorKey.PAGE_UP.value:
+                E.cy = E.rowoff
+            elif c == EditorKey.PAGE_DOWN.value:
+                E.cy = E.rowoff + E.screenrows - 1
+                if E.cy > E.numrows: E.cy = E.numrows
+
             times = E.screenrows
             while times != 0:
                 editor_move_cursor(EditorKey.MOVE_UP.value if c == EditorKey.PAGE_UP.value else EditorKey.MOVE_DOWN.value)

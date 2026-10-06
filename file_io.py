@@ -7,6 +7,8 @@ from row_operations import editor_append_row
 sys.dont_write_bytecode = True
 
 def editor_open(filename: str) -> None:
+    E.filename = filename
+
     try:
         with open(filename, "r") as f:
             #line = f.readline()
@@ -14,7 +16,7 @@ def editor_open(filename: str) -> None:
             for line in f:
                 linelen = len(line)
                 while linelen > 0 and (line[linelen - 1] == '\n' or line[linelen - 1] == '\r'): linelen -= 1
-                editor_append_row(line, linelen)
+                editor_append_row(line[:linelen], linelen)
 
     except OSError:
         die("open")

@@ -7,12 +7,16 @@ sys.dont_write_bytecode = True
 
 # Helper functions
 # This one can be replace by importing urses.ascii.iscntrl()
-def iscntrl(char):
-    char = char.decode("utf-8") # In c we dont have to do this convertion.
-    if isinstance(char, str):
-        val = int(ord(char)) 
-    else:
-        val = char
+#def iscntrl(char):
+#    char = char.decode("utf-8") # In c we dont have to do this convertion.
+#    if isinstance(char, str):
+#        val = int(ord(char)) 
+#    else:
+#        val = char
+#    return (0 <= val <= 31) or (val == 127)
+
+def iscntrl(char: bytes) -> bool: # We do this because we apply s.decode later so everything that comes here is a string.
+    val = ord(char.decode("utf-8"))
     return (0 <= val <= 31) or (val == 127)
 
 def perror(s: str): # Python automatically halts the program when it encounters and error, so this function and all instances of it are useless unless with a try/excpet.
@@ -60,6 +64,9 @@ class EditConfig:
     screenrows: int = 0
     screencols: int = 0
     numrows: int = 0
+    filename: str = "New"
+    statusmsg: str = '\0'
+    statusmsg_time: int = 0
 
 @dataclass
 class Winsize:
@@ -76,8 +83,6 @@ TAB_STOP_SIZE = 4
 def CTRL_KEY(k):
     return ord(k) & 0x1f
 
-#orig_termios = TtyAttributes(*termios.tcgetattr(STDIN_FILENO))
-#row_init_data = [0, " "]
 E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
 
 class EditorKey(Enum):

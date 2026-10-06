@@ -1,5 +1,6 @@
 import os
 import sys
+from time import time
 
 from data import STDOUT_FILENO, E, TIZATL_VERSION
 from append_buffer import Abuf, ab_append, ab_free#, ABUF_INIT
@@ -12,6 +13,9 @@ def editor_scroll():
 
     if E.cy < E.numrows:
         E.rx = editor_row_cx_to_rx(E.row[E.cy], E.cx)
+
+    if E.cy < E.rowoff:
+        E.rowoff = E.cy
 
     if E.cy >= E.rowoff + E.screenrows:
         E.rowoff = E.cy - E.screenrows + 1
@@ -49,8 +53,36 @@ def editor_draw_rows(ab: Abuf) -> None:
             ab_append(ab, E.row[filerow].render[E.coloff : E.coloff + length], length)
             
         ab_append(ab, "\x1b[K", 3)
-        if (y < E.screenrows - 1):
-            ab_append(ab, "\r\n", 2)
+        ab_append(ab, "\r\n", 2)
+
+def editor_draw_status_bar(ab: Abuf) -> None:
+    ab_append(ab, "\x1b[7m", 4)
+
+    status = f"{E.filename[:20]} - {E.numrows} lines"
+    length = len(status)
+
+    rstatus = f"{E.cy + 1}/{E.numrows}"
+    rlength = len(rstatus)
+
+    if length > E.screencols: length = E.screencols
+    ab_append(ab, status, length)
+    while length < E.screencols:
+        if E.screencols - length == rlength:
+            ab_append(ab, rstatus, rlength)
+            break
+        else:
+            ab_append(ab, " ", 1)
+            length += 1
+
+    ab_append(ab, "\x1b[m", 3)
+    ab_append(ab, "\r\n", 2)
+
+def editor_draw_message_bar(ab: Abuf) -> None:
+    ab_append(ab, "\x1b[K", 3)
+    msglen = len(E.statusmsg)
+    if msglen > E.screencols: msgeln = E.screencols
+    if msglen and time() - E.statusmsg_time < 5:
+        ab_append(ab, E.statusmsg, msglen)
 
 def editor_refresh_screen() -> None:
     editor_scroll()
@@ -61,6 +93,8 @@ def editor_refresh_screen() -> None:
     ab_append(ab, "\x1b[H", 3)
 
     editor_draw_rows(ab)
+    editor_draw_status_bar(ab)
+    editor_draw_message_bar(ab)
 
     buf = f"\x1b[{(E.cy - E.rowoff) + 1};{(E.rx - E.coloff) + 1}H"
     ab_append(ab, buf, len(buf))
@@ -69,3 +103,7 @@ def editor_refresh_screen() -> None:
 
     os.write(STDOUT_FILENO, ab.b[:ab.length])
     ab_free(ab)
+
+def editor_set_status_message(fmt: str, *args) -> None:
+    E.statusmsg = fmt.format(*args)
+    E.statusmsg_time = time()
