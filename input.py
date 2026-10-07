@@ -4,8 +4,10 @@ import os
 sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
-from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow
+from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow, QUIT_TIMES
 from editor_operations import editor_insert_char
+from file_io import editor_save
+from output import editor_set_status_message, editor_refresh_screen
 
 sys.dont_write_bytecode = True
 
@@ -43,16 +45,27 @@ def editor_process_keypress() -> None:
             return # TODO
 
         if c[0] == CTRL_KEY('q'):
+            if E.dirty and E.quit_times > 0:
+                editor_set_status_message(f"WARNING!!! File has unsaved changes. Press Ctrl-Q {E.quit_times} more times to quit.")
+                E.quit_times -= 1
+                return
+
             os.write(STDOUT_FILENO, b'\x1b[2J'[:4])
             os.write(STDOUT_FILENO, b'\x1b[H'[:3])
             sys.exit(0)
 
+        if c[0] == CTRL_KEY('s'):
+            editor_save()
+            return
+
         if c == EditorKey.HOME_KEY.value:
             E.cx = 0
+            return
 
         if c == EditorKey.END_KEY.value:
             if E.cy < E.numrows:
                 E.cx = E.row[E.cy].size
+            return
 
         if c == EditorKey.BACKSPACE.value or c[0] == CTRL_KEY('h') or c == EditorKey.DEL_KEY.value:
             return # TODO
@@ -68,6 +81,7 @@ def editor_process_keypress() -> None:
             while times != 0:
                 editor_move_cursor(EditorKey.MOVE_UP.value if c == EditorKey.PAGE_UP.value else EditorKey.MOVE_DOWN.value)
                 times -= 1
+            return
 
         if c in EditorKey:
             editor_move_cursor(c)
@@ -75,3 +89,5 @@ def editor_process_keypress() -> None:
             return
         else:
             editor_insert_char(c)
+
+        E.quit_times = QUIT_TIMES

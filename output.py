@@ -58,7 +58,7 @@ def editor_draw_rows(ab: Abuf) -> None:
 def editor_draw_status_bar(ab: Abuf) -> None:
     ab_append(ab, "\x1b[7m", 4)
 
-    status = f"{E.filename[:20]} - {E.numrows} lines"
+    status = f"{E.filename[:20]} - {E.numrows} lines {"modified" if E.dirty else ""}"
     length = len(status)
 
     rstatus = f"{E.cy + 1}/{E.numrows}"

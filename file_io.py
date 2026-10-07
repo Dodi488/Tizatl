@@ -1,10 +1,33 @@
 import sys
+import errno
 
 from data import E, Erow
 from terminal import die
 from row_operations import editor_append_row
+from output import editor_set_status_message
 
 sys.dont_write_bytecode = True
+
+def editor_rows_to_string(blufen: int) -> str: # "".joind(blufen)?
+    totlen = 0
+    for j in range(E.numrows):
+        totlen += E.row[j].size + 1
+    buflen = totlen
+
+#    buf = bytearray(totlen)
+#    n = 0
+#    p = buf[n]
+#    for j in range(E.numrows):
+#        p = (E.row[j].chars)[E.row[j].size]
+#        p += E.row[j].size
+        # p = p + '\n'
+#        n += 1
+
+    buf = [""] * totlen # bytearray(buflen)
+    for j in range(E.numrows):
+        buf[j] = E.row[j].chars + '\n'
+
+    return ''.join(buf)
 
 def editor_open(filename: str) -> None:
     E.filename = filename
@@ -17,6 +40,7 @@ def editor_open(filename: str) -> None:
                 linelen = len(line)
                 while linelen > 0 and (line[linelen - 1] == '\n' or line[linelen - 1] == '\r'): linelen -= 1
                 editor_append_row(line[:linelen], linelen)
+                E.dirty = False
 
     except OSError:
         die("open")
@@ -34,3 +58,18 @@ def editor_open(filename: str) -> None:
     #editor_append_row(line, linelen)
 
     # free(line) and fclose(fp)
+
+def editor_save() -> None:
+    if E.filename == None: return
+
+    length = 0
+    buf = editor_rows_to_string(length)
+    length = len(buf.encode("utf-8"))
+
+    try:
+        with open(E.filename, "w") as f:
+            f.write(buf)
+            E.dirty = False
+            editor_set_status_message(f"{length} bytes written to disk")
+    except OSError as e:
+        editor_set_status_message(f"Can't save! I/O error: {e.errno}")

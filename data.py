@@ -5,6 +5,8 @@ from enum import Enum
 
 sys.dont_write_bytecode = True
 
+QUIT_TIMES = 3
+
 # Helper functions
 # This one can be replace by importing urses.ascii.iscntrl()
 #def iscntrl(char):
@@ -64,6 +66,8 @@ class EditConfig:
     screenrows: int = 0
     screencols: int = 0
     numrows: int = 0
+    dirty: bool = False
+    quit_times: int = QUIT_TIMES
     filename: str = "New"
     statusmsg: str = '\0'
     statusmsg_time: int = 0

@@ -41,7 +41,7 @@ def main():
     if len(sys.argv) >= 2:
         editor_open(sys.argv[1])
 
-    editor_set_status_message("HELP: Ctrl-Q = quit")
+    editor_set_status_message("HELP: Ctrl-S = save | Ctrl-Q = quit")
 
     while True:
         editor_refresh_screen()
