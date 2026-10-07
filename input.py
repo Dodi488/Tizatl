@@ -5,7 +5,7 @@ sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
 from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow, QUIT_TIMES
-from editor_operations import editor_insert_char
+from editor_operations import editor_insert_char, editor_del_char
 from file_io import editor_save
 from output import editor_set_status_message, editor_refresh_screen
 
@@ -68,7 +68,9 @@ def editor_process_keypress() -> None:
             return
 
         if c == EditorKey.BACKSPACE.value or c[0] == CTRL_KEY('h') or c == EditorKey.DEL_KEY.value:
-            return # TODO
+            if c == EditorKey.DEL_KEY.value: editor_move_cursor(EditorKey.MOVE_RIGHT.value)
+            editor_del_char()
+            return
 
         if c == EditorKey.PAGE_UP.value or c == EditorKey.PAGE_DOWN.value:
             if c == EditorKey.PAGE_UP.value:

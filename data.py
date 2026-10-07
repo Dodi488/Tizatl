@@ -90,7 +90,7 @@ def CTRL_KEY(k):
 E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
 
 class EditorKey(Enum):
-    BACKSPACE = 127
+    BACKSPACE = b'\x7f'
     MOVE_LEFT = b'h'
     MOVE_RIGHT = b'l'
     MOVE_UP = b'k'

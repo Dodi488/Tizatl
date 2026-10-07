@@ -49,9 +49,14 @@ def editor_append_row(s: str, linelen: int) -> None:
 
 def editor_row_insert_char(row: Erow, at: int, c: int) -> None:
     if at < 0 or at > row.size: at = row.size 
-
     row.chars = row.chars[:at] + c.decode("utf-8") + row.chars[at:]
     row.size += 1
+    editor_update_row(row)
+    E.dirty = True
 
+def editor_row_del_char(row: Erow, at: int) -> None:
+    if at < 0 or at >= row.size: return
+    row.chars = row.chars[:at] + row.chars[at + 1:]
+    row.size -= 1
     editor_update_row(row)
     E.dirty = True
