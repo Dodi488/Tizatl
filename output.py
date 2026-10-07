@@ -80,7 +80,7 @@ def editor_draw_status_bar(ab: Abuf) -> None:
 def editor_draw_message_bar(ab: Abuf) -> None:
     ab_append(ab, "\x1b[K", 3)
     msglen = len(E.statusmsg)
-    if msglen > E.screencols: msgeln = E.screencols
+    if msglen > E.screencols: msglen = E.screencols
     if msglen and time() - E.statusmsg_time < 5:
         ab_append(ab, E.statusmsg, msglen)
 

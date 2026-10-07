@@ -5,6 +5,7 @@ sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
 from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow
+from editor_operations import editor_insert_char
 
 sys.dont_write_bytecode = True
 
@@ -38,6 +39,9 @@ def editor_move_cursor(key: bytes) -> None:
 def editor_process_keypress() -> None:
     c = editor_read_key()
     if c:
+        if c == b'\r':
+            return # TODO
+
         if c[0] == CTRL_KEY('q'):
             os.write(STDOUT_FILENO, b'\x1b[2J'[:4])
             os.write(STDOUT_FILENO, b'\x1b[H'[:3])
@@ -49,6 +53,9 @@ def editor_process_keypress() -> None:
         if c == EditorKey.END_KEY.value:
             if E.cy < E.numrows:
                 E.cx = E.row[E.cy].size
+
+        if c == EditorKey.BACKSPACE.value or c[0] == CTRL_KEY('h') or c == EditorKey.DEL_KEY.value:
+            return # TODO
 
         if c == EditorKey.PAGE_UP.value or c == EditorKey.PAGE_DOWN.value:
             if c == EditorKey.PAGE_UP.value:
@@ -64,3 +71,7 @@ def editor_process_keypress() -> None:
 
         if c in EditorKey:
             editor_move_cursor(c)
+        elif c[0] == CTRL_KEY('l') or c == '\x1b':
+            return
+        else:
+            editor_insert_char(c)

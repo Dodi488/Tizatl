@@ -19,7 +19,6 @@ def editor_update_row(row: Erow) -> None:
     for j in range(row.size):
         if row.chars[j] == '\t': tabs += 1
 
-    #row.render = " "
     row.render = "0" * (row.size + tabs * (TAB_STOP_SIZE - 1) + 1)
 
     idx = 0
@@ -35,8 +34,8 @@ def editor_update_row(row: Erow) -> None:
             row.render[idx] = row.chars[j]
             idx += 1
 
-    row.render[idx:] = '\0' # This is not necessary in python.
-    row.render = "".join(row.render)
+    #row.render[idx:] = '\0' # This is not necessary in python.
+    row.render = "".join(row.render[:idx])
     row.rsize = idx
 
 def editor_append_row(s: str, linelen: int) -> None:
@@ -64,3 +63,16 @@ def editor_append_row(s: str, linelen: int) -> None:
     editor_update_row(E.row[at])
 
     E.numrows += 1
+
+def editor_row_insert_char(row: Erow, at: int, c: int) -> None:
+    if at < 0 or at > row.size: at = row.size
+    #row.chars = realloc(bytearray(row.chars, "utf-8"), row.size + 2)
+    #row.chars[at + 1] = row.chars[at]
+    #row.size += 1
+    #row.chars[at] = c[0]
+    #row.chars = row.chars.decode("utf-8")
+
+    row.chars = row.chars[:at] + c.decode("utf-8") + row.chars[at:]
+    row.size += 1
+
+    editor_update_row(row)

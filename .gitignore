@@ -4,7 +4,6 @@ complete
 complete.c
 defines.py
 find.py
-editor_operations.py
 filetype.py
 test.txt
 old_prueba.py
