@@ -3,7 +3,7 @@ import errno
 
 from data import E, Erow
 from terminal import die
-from row_operations import editor_append_row
+from row_operations import editor_insert_row
 from output import editor_set_status_message
 
 sys.dont_write_bytecode = True
@@ -39,7 +39,7 @@ def editor_open(filename: str) -> None:
             for line in f:
                 linelen = len(line)
                 while linelen > 0 and (line[linelen - 1] == '\n' or line[linelen - 1] == '\r'): linelen -= 1
-                editor_append_row(line[:linelen], linelen)
+                editor_insert_row(E.numrows, line[:linelen], linelen)
                 E.dirty = False
 
     except OSError:

@@ -5,7 +5,7 @@ sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
 from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow, QUIT_TIMES
-from editor_operations import editor_insert_char, editor_del_char
+from editor_operations import editor_insert_char, editor_del_char, editor_insert_char, editor_insert_new_line
 from file_io import editor_save
 from output import editor_set_status_message, editor_refresh_screen
 
@@ -42,7 +42,8 @@ def editor_process_keypress() -> None:
     c = editor_read_key()
     if c:
         if c == b'\r':
-            return # TODO
+            editor_insert_new_line()
+            return
 
         if c[0] == CTRL_KEY('q'):
             if E.dirty and E.quit_times > 0:
