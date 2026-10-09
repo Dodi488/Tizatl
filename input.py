@@ -4,12 +4,49 @@ import os
 sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
-from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow, QUIT_TIMES
+from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow, QUIT_TIMES, iscntrl
 from editor_operations import editor_insert_char, editor_del_char, editor_insert_char, editor_insert_new_line
 from file_io import editor_save
 from output import editor_set_status_message, editor_refresh_screen
 
 sys.dont_write_bytecode = True
+
+def editor_prompt(prompt: str) -> str:
+    bufsize = 128
+    #buf = bytearray(bufsize)
+    #buf = [" "] * bufsize 
+    buf = E.filename
+
+    buflen = 0
+    #buf[0] = b'\0'
+
+    while True:
+        message = prompt.format(buf)
+        editor_set_status_message(message)
+        editor_refresh_screen()
+
+        c = editor_read_key()
+        if c == EditorKey.DEL_KEY or c == CTRL_KEY('h') or c == EditorKey.BACKSPACE:
+            if buflen != 0: buf[buflen - 1] = '\0'
+        elif c == b'\x1b':
+            editor_set_status_message("")
+            return ""
+        elif c == b'\r':
+            if buflen != 0:
+                editor_set_status_message("")
+                return buf
+
+        elif not iscntrl(c) and c[0] < 128:
+            #if buflen == bufsize - 1:
+                #bufsize *= 2
+                #buf = realloc(buf, bufsize)
+            buflen += 1
+            #buf[buflen] = ord(c)
+            #buf[buflen] = c.decode("utf-8")
+            #print(buf)
+            #0[0] = 0
+            #buf[buflen] = '\0' # This is not necessary in python and I think it will cause an error.
+            buf = buf + c.decode("utf-8")
 
 def editor_move_cursor(key: bytes) -> None:
     row = None if E.cy >= E.numrows else E.row[E.cy]

@@ -68,7 +68,7 @@ class EditConfig:
     numrows: int = 0
     dirty: bool = False
     quit_times: int = QUIT_TIMES
-    filename: str = "New"
+    filename: str = ""
     statusmsg: str = '\0'
     statusmsg_time: int = 0
 
@@ -91,10 +91,10 @@ E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
 
 class EditorKey(Enum):
     BACKSPACE = b'\x7f'
-    MOVE_LEFT = b'h'
-    MOVE_RIGHT = b'l'
-    MOVE_UP = b'k'
-    MOVE_DOWN = b'j'
+    MOVE_LEFT = b'\x1b[D' #b'h'
+    MOVE_RIGHT = b'\x1b[C' #b'l'
+    MOVE_UP = b'\x1b[A' #b'k'
+    MOVE_DOWN = b'\x1b[B' #b'j'
     HOME_KEY = b'\x1b[1~'
     DEL_KEY = b'\x1b[3~'
     END_KEY = b'\x1b[4~'

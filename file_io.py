@@ -60,7 +60,12 @@ def editor_open(filename: str) -> None:
     # free(line) and fclose(fp)
 
 def editor_save() -> None:
-    if E.filename == None: return
+    from input import editor_prompt
+    if E.filename == "":
+        E.filename = editor_prompt("Save as: {} (ESC to cancel)")
+        if E.filename == "":
+            editor_set_status_message("Save aborted")
+            return
 
     length = 0
     buf = editor_rows_to_string(length)
