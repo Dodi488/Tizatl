@@ -18,6 +18,8 @@ QUIT_TIMES = 3
 #    return (0 <= val <= 31) or (val == 127)
 
 def iscntrl(char: bytes) -> bool: # We do this because we apply s.decode later so everything that comes here is a string.
+    if char in (b'\x1b[A', b'\x1b[B', b'\x1b[C', b'\x1b[D'):
+        return True
     val = ord(char.decode("utf-8"))
     return (0 <= val <= 31) or (val == 127)
 
