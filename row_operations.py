@@ -14,6 +14,17 @@ def editor_row_cx_to_rx(row: Erow, cx: int) -> int:
 
     return rx
 
+def editor_row_rx_to_cx(row: Erow, rx: int) -> int:
+    cur_rx = 0
+    for cx in range(row.size):
+        if row.chars[cx] == '\t':
+            cur_rx += (TAB_STOP_SIZE - 1) - (cur_rx % TAB_STOP_SIZE)
+        cur_rx += 1
+
+        if cur_rx > rx: return cx
+
+    return cx # Just in case.
+
 def editor_update_row(row: Erow) -> None:
     tabs = 0
     for j in range(row.size):

@@ -1,5 +1,6 @@
 import sys
 import os
+from collections.abc import Callable
 
 sys.dont_write_bytecode = True
 
@@ -8,14 +9,16 @@ from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow, QUIT_TIMES, iscntr
 from editor_operations import editor_insert_char, editor_del_char, editor_insert_char, editor_insert_new_line
 from file_io import editor_save
 from output import editor_set_status_message, editor_refresh_screen
+from find import editor_find
 
 sys.dont_write_bytecode = True
 
-def editor_prompt(prompt: str) -> str:
+def editor_prompt(prompt: str, callback: Callable[[str, bytes], None] | None = None) -> str:
     bufsize = 128
     #buf = bytearray(bufsize)
     #buf = [" "] * bufsize 
-    buf = E.filename
+    #buf = E.filename
+    buf = ""
 
     buflen = 0
     #buf[0] = b'\0'
@@ -26,14 +29,19 @@ def editor_prompt(prompt: str) -> str:
         editor_refresh_screen()
 
         c = editor_read_key()
-        if c == EditorKey.DEL_KEY or c == CTRL_KEY('h') or c == EditorKey.BACKSPACE:
-            if buflen != 0: buf[buflen - 1] = '\0'
+        if c == EditorKey.DEL_KEY.value or c[0] == CTRL_KEY('h') or c == EditorKey.BACKSPACE.value:
+            #if buflen != 0: buf[buflen - 1] = '\0'
+            if buflen != 0:
+                buf = buf[:-1]
+                buflen -= 1
         elif c == b'\x1b':
             editor_set_status_message("")
-            return ""
+            if callback: callback(buf, c)
+            return None
         elif c == b'\r':
             if buflen != 0:
                 editor_set_status_message("")
+                if callback: callback(buf, c)
                 return buf
 
         elif not iscntrl(c) and c[0] < 128:
@@ -47,6 +55,8 @@ def editor_prompt(prompt: str) -> str:
             #0[0] = 0
             #buf[buflen] = '\0' # This is not necessary in python and I think it will cause an error.
             buf = buf + c.decode("utf-8")
+
+        if callback: callback(buf, c)
 
 def editor_move_cursor(key: bytes) -> None:
     row = None if E.cy >= E.numrows else E.row[E.cy]
@@ -103,6 +113,10 @@ def editor_process_keypress() -> None:
         if c == EditorKey.END_KEY.value:
             if E.cy < E.numrows:
                 E.cx = E.row[E.cy].size
+            return
+
+        if c[0] == CTRL_KEY('f'):
+            editor_find()
             return
 
         if c == EditorKey.BACKSPACE.value or c[0] == CTRL_KEY('h') or c == EditorKey.DEL_KEY.value:

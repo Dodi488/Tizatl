@@ -62,7 +62,7 @@ def editor_open(filename: str) -> None:
 def editor_save() -> None:
     from input import editor_prompt
     if E.filename == "":
-        E.filename = editor_prompt("Save as: {} (ESC to cancel)")
+        E.filename = editor_prompt("Save as: {} (ESC to cancel)", "")
         if E.filename == "":
             editor_set_status_message("Save aborted")
             return
