@@ -2,7 +2,9 @@ import os
 import sys
 from time import time
 
-from data import STDOUT_FILENO, E, TIZATL_VERSION
+from defines import STDOUT_FILENO, TIZATL_VERSION, EditorHighlight
+from syntax_highlighting import editor_syntax_to_color
+from data import E
 from append_buffer import Abuf, ab_append, ab_free#, ABUF_INIT
 from row_operations import editor_row_cx_to_rx
 
@@ -32,8 +34,10 @@ def editor_draw_rows(ab: Abuf) -> None:
         if (filerow >= E.numrows):
             if (E.numrows == 0 and y == E.screenrows // 3):
                 welcome = f"Tizatl editor -- version {TIZATL_VERSION}"
+                #welcomelen = len(welcome) if (welcomelen > E.screencols): welcomelen = E.screencols
                 welcomelen = len(welcome)
-                if (welcomelen > E.screencols): welcomelen = E.screencols
+                if welcomelen > E.screencols:
+                    welcomelen = E.screencols
                 padding = (E.screencols - welcomelen) // 2
                 if padding:
                     ab_append(ab, "~", 1)
@@ -49,8 +53,29 @@ def editor_draw_rows(ab: Abuf) -> None:
         else:
             length = E.row[filerow].rsize - E.coloff
             if length < 0: length = 0
-            if length > E.screencols: length = E.screencols
-            ab_append(ab, E.row[filerow].render[E.coloff : E.coloff + length], length)
+            if length > E.screencols: length = len(E.screencols)
+            c = E.row[filerow].render[E.coloff:]
+            hl = E.row[filerow].hl[E.coloff:]
+            #hl = E.row[filerow].hl
+            current_color = -1
+            for j in range(length):
+                if hl[j] == EditorHighlight.HL_NORMAL.value:
+                    if current_color != -1:
+                        ab_append(ab, "\x1b[39m", 5)
+                        current_color = -1
+                    ab_append(ab, c[j], 1)
+                else:
+                    color = editor_syntax_to_color(hl[j])
+                    if color != current_color:
+                        current_color = color
+                        # buf = bytearray(16) This is not necessary because we will store the return value of string.format(color) in clen.
+                        #buf = " " * 16
+                        buf = "\x1b[{}m".format(color)
+                        clen = len(buf)
+                        ab_append(ab, buf, clen)
+                    ab_append(ab, c[j], 1)
+
+            ab_append(ab, "\x1b[39m", 5)
             
         ab_append(ab, "\x1b[K", 3)
         ab_append(ab, "\r\n", 2)

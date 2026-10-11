@@ -27,6 +27,7 @@ def init_editor() -> None:
     #E.filename = "New"
     #E.statusmsg[0] = '\0' # Cant add something to a string using slicing, either change statusmsg to an array or concatenate '\0' to the beggining.
     # E.statusmsg_time = 0
+    # E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO))) This will cause a circular import error.
 
     try:
         get_window_size(E)

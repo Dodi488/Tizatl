@@ -1,6 +1,7 @@
 import sys
 
-from data import E, EditorKey
+from data import E
+from defines import EditorKey
 from row_operations import editor_row_rx_to_cx
 
 sys.dont_write_bytecode = True

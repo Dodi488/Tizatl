@@ -1,7 +1,8 @@
 import sys
 from dataclasses import dataclass, field, astuple, replace
 import termios
-from enum import Enum
+
+from defines import STDIN_FILENO, STDOUT_FILENO
 
 sys.dont_write_bytecode = True
 
@@ -9,14 +10,6 @@ QUIT_TIMES = 3
 
 # Helper functions
 # This one can be replace by importing urses.ascii.iscntrl()
-#def iscntrl(char):
-#    char = char.decode("utf-8") # In c we dont have to do this convertion.
-#    if isinstance(char, str):
-#        val = int(ord(char)) 
-#    else:
-#        val = char
-#    return (0 <= val <= 31) or (val == 127)
-
 def iscntrl(char: bytes) -> bool: # We do this because we apply s.decode later so everything that comes here is a string.
     if char in (b'\x1b[A', b'\x1b[B', b'\x1b[C', b'\x1b[D'):
         return True
@@ -29,6 +22,9 @@ def perror(s: str): # Python automatically halts the program when it encounters 
         print(f"{s}: {exc_value}", file=sys.stderr)
     else:
         print(s, file=sys.stderr)
+
+def CTRL_KEY(k):
+    return ord(k) & 0x1f
 
 def realloc(b: bytearray, length: int) -> bytearray: # bytearray.resize()
     if len(b) == length:
@@ -53,8 +49,9 @@ class Erow:
     size: int
     rsize: int
     chars: str
-    #render: list[str] = field(default_factory=list)
     render: str
+    #hl: str
+    hl: list[int] = field(default_factory=list)
 
 @dataclass
 class EditConfig:
@@ -81,24 +78,4 @@ class Winsize:
     ws_xpixel: int
     ws_ypixel: int
 
-STDIN_FILENO = sys.stdin.fileno()
-STDOUT_FILENO = sys.stdout.fileno()
-TIZATL_VERSION = "0.0.1"
-TAB_STOP_SIZE = 4
-
-def CTRL_KEY(k):
-    return ord(k) & 0x1f
-
 E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
-
-class EditorKey(Enum):
-    BACKSPACE = b'\x7f'
-    MOVE_LEFT = b'\x1b[D' #b'h'
-    MOVE_RIGHT = b'\x1b[C' #b'l'
-    MOVE_UP = b'\x1b[A' #b'k'
-    MOVE_DOWN = b'\x1b[B' #b'j'
-    HOME_KEY = b'\x1b[1~'
-    DEL_KEY = b'\x1b[3~'
-    END_KEY = b'\x1b[4~'
-    PAGE_UP = b'\x1b[5~'
-    PAGE_DOWN = b'\x1b[6~'

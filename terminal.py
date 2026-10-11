@@ -9,6 +9,7 @@ import array
 #import tuple
 
 from data import *
+from defines import STDIN_FILENO, STDOUT_FILENO, EditorKey
 
 sys.dont_write_bytecode = True
 

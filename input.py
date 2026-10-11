@@ -5,7 +5,8 @@ from collections.abc import Callable
 sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
-from data import CTRL_KEY, STDOUT_FILENO, E, EditorKey, Erow, QUIT_TIMES, iscntrl
+from data import CTRL_KEY, E, Erow, QUIT_TIMES, iscntrl
+from defines import EditorKey, STDOUT_FILENO
 from editor_operations import editor_insert_char, editor_del_char, editor_insert_char, editor_insert_new_line
 from file_io import editor_save
 from output import editor_set_status_message, editor_refresh_screen
@@ -15,13 +16,9 @@ sys.dont_write_bytecode = True
 
 def editor_prompt(prompt: str, callback: Callable[[str, bytes], None] | None = None) -> str:
     bufsize = 128
-    #buf = bytearray(bufsize)
-    #buf = [" "] * bufsize 
-    #buf = E.filename
     buf = ""
 
     buflen = 0
-    #buf[0] = b'\0'
 
     while True:
         message = prompt.format(buf)
@@ -30,14 +27,13 @@ def editor_prompt(prompt: str, callback: Callable[[str, bytes], None] | None = N
 
         c = editor_read_key()
         if c == EditorKey.DEL_KEY.value or c[0] == CTRL_KEY('h') or c == EditorKey.BACKSPACE.value:
-            #if buflen != 0: buf[buflen - 1] = '\0'
             if buflen != 0:
                 buf = buf[:-1]
                 buflen -= 1
         elif c == b'\x1b':
             editor_set_status_message("")
             if callback: callback(buf, c)
-            return None
+            return ""
         elif c == b'\r':
             if buflen != 0:
                 editor_set_status_message("")
@@ -45,15 +41,7 @@ def editor_prompt(prompt: str, callback: Callable[[str, bytes], None] | None = N
                 return buf
 
         elif not iscntrl(c) and c[0] < 128:
-            #if buflen == bufsize - 1:
-                #bufsize *= 2
-                #buf = realloc(buf, bufsize)
             buflen += 1
-            #buf[buflen] = ord(c)
-            #buf[buflen] = c.decode("utf-8")
-            #print(buf)
-            #0[0] = 0
-            #buf[buflen] = '\0' # This is not necessary in python and I think it will cause an error.
             buf = buf + c.decode("utf-8")
 
         if callback: callback(buf, c)
@@ -139,7 +127,7 @@ def editor_process_keypress() -> None:
 
         if c in EditorKey:
             editor_move_cursor(c)
-        elif c[0] == CTRL_KEY('l') or c == '\x1b':
+        elif c[0] == CTRL_KEY('l') or c == b'\x1b':
             return
         else:
             editor_insert_char(c)

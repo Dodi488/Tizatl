@@ -1,7 +1,9 @@
 import sys
 from dataclasses import fields
 
-from data import E, realloc, Erow, TAB_STOP_SIZE
+from data import E, realloc, Erow
+from defines import TAB_STOP_SIZE
+from syntax_highlighting import editor_update_syntax
 
 sys.dont_write_bytecode = True
 
@@ -45,17 +47,15 @@ def editor_update_row(row: Erow) -> None:
             row.render[idx] = row.chars[j]
             idx += 1
 
-    #row.render[idx:] = '\0' # This is not necessary in python.
     row.render = "".join(row.render[:idx])
     row.rsize = idx
 
-#def editor_append_row(s: str, linelen: int) -> None:
+    editor_update_syntax(row)
+
 def editor_insert_row(at: int, s: str, length: int) -> None:
     if at < 0 or at > E.numrows: return
 
-    #new_row = E.row.append(Erow(size=length, chars=s[:length], rsize=0, render=""))
-    #E.row.insert(at, new_row)
-    new_row = Erow(size=length, chars=s[:length], rsize=0, render="")
+    new_row = Erow(size=length, chars=s[:length], rsize=0, render="") # hl default is already a list so no need to define it here.
     E.row.insert(at, new_row)
     editor_update_row(E.row[at])
 
@@ -65,12 +65,11 @@ def editor_insert_row(at: int, s: str, length: int) -> None:
 def editor_free_row(row: Erow) -> None: # This is not necessary in python.
     row.render = ""
     row.chars = ""
+    row.hl = ""
 
 def editor_del_row(at: int) -> None:
     if at < 0 or at >= E.numrows: return
-    #editor_free_row(E.row[at])
     del E.row[at]
-    #E.row[at] = E.row[at + 1]
     E.numrows -= 1
     E.dirty = True
 
@@ -82,11 +81,8 @@ def editor_row_insert_char(row: Erow, at: int, c: int) -> None:
     E.dirty = True
 
 def editor_row_append_string(row: Erow, s: str, length: int) -> None:
-    #row.chars = row.chars + (" " * row.size + length + 1) This is not necessary because stings in python are dynamic.
-    #row.chars[row.size] = s
     row.chars = row.chars[:row.size] + s + row.chars[row.size:]
     row.size += length
-    #row.chars[row.size] = '\0' This is the same as row.chars = row.chars + '\0'
     editor_update_row(row)
     E.dirty = True
 
