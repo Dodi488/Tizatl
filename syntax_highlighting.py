@@ -15,6 +15,9 @@ def editor_update_syntax(row: Erow) -> None:
 
     if E.syntax == None: return
 
+    scs = E.syntax.singleline_comment_start
+    scs_len = len(scs) if scs else 0
+
     prev_state = 1
     in_string = 0
 
@@ -22,6 +25,12 @@ def editor_update_syntax(row: Erow) -> None:
     while i < row.rsize:
         c = row.render[i]
         prev_hl = row.hl[i - 1] if i > 0 else EditorHighlight.HL_NORMAL.value
+
+        if scs_len and not in_string:
+            #if not row.render[i][:scs_len] == scs[:scs_len]:
+            if row.render[i:i+scs_len] == scs:
+                row.hl[i:] = [EditorHighlight.HL_COMMENT.value] * (row.rsize - i)
+                return
 
         if E.syntax.flags & HL_HIGHLIGHT_STRINGS:
             if in_string:
@@ -54,6 +63,8 @@ def editor_update_syntax(row: Erow) -> None:
 
 def editor_syntax_to_color(hl: int) -> int:
     match hl:
+        case EditorHighlight.HL_COMMENT.value:
+            return 36
         case EditorHighlight.HL_STRING.value:
             return 35
         case EditorHighlight.HL_NUMBER.value:
@@ -97,5 +108,5 @@ def editor_select_syntax_highlight() -> None:
                 E.syntax = s
                 return
 
-                for filerow in range(E.numrows):
-                    editor_update_syntax(E.row[filerow])
+            for filerow in range(E.numrows):
+                editor_update_syntax(E.row[filerow])

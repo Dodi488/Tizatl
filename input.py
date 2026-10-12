@@ -5,8 +5,8 @@ from collections.abc import Callable
 sys.dont_write_bytecode = True
 
 from terminal import editor_read_key
-from data import CTRL_KEY, E, Erow, QUIT_TIMES, iscntrl
-from defines import EditorKey, STDOUT_FILENO
+from data import CTRL_KEY, E, Erow, iscntrl
+from defines import EditorKey, STDOUT_FILENO, QUIT_TIMES
 from editor_operations import editor_insert_char, editor_del_char, editor_insert_char, editor_insert_new_line
 from file_io import editor_save
 from output import editor_set_status_message, editor_refresh_screen

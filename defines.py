@@ -9,6 +9,7 @@ STDIN_FILENO = sys.stdin.fileno()
 STDOUT_FILENO = sys.stdout.fileno()
 TIZATL_VERSION = "0.0.1"
 TAB_STOP_SIZE = 4
+QUIT_TIMES = 3
 
 @dataclass
 class EditorKey(Enum):
@@ -25,9 +26,10 @@ class EditorKey(Enum):
 
 class EditorHighlight(Enum):
     HL_NORMAL = 0
-    HL_STRING = 1
-    HL_NUMBER = 2
-    HL_MATCH = 3
+    HL_COMMENT = 1
+    HL_STRING = 2
+    HL_NUMBER = 3
+    HL_MATCH = 4
 
 HL_HIGHLIGHT_NUMBERS = (1<<0)
 HL_HIGHLIGHT_STRINGS = (1<<1)

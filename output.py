@@ -34,10 +34,11 @@ def editor_draw_rows(ab: Abuf) -> None:
         if (filerow >= E.numrows):
             if (E.numrows == 0 and y == E.screenrows // 3):
                 welcome = f"Tizatl editor -- version {TIZATL_VERSION}"
+                welcomelen = len(welcome) if welcomelen > E.screencols else E.screencols
                 #welcomelen = len(welcome) if (welcomelen > E.screencols) else welcomelen = E.screencols
-                welcomelen = len(welcome)
-                if welcomelen > E.screencols:
-                    welcomelen = E.screencols
+                #welcomelen = len(welcome)
+                #if welcomelen > E.screencols:
+                #    welcomelen = E.screencols
                 padding = (E.screencols - welcomelen) // 2
                 if padding:
                     ab_append(ab, "~", 1)

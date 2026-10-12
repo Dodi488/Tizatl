@@ -2,11 +2,9 @@ import sys
 from dataclasses import dataclass, field, astuple, replace
 import termios
 
-from defines import STDIN_FILENO, STDOUT_FILENO
+from defines import STDIN_FILENO, STDOUT_FILENO, QUIT_TIMES
 
 sys.dont_write_bytecode = True
-
-QUIT_TIMES = 3
 
 # Helper functions
 # This one can be replace by importing urses.ascii.iscntrl()
@@ -49,6 +47,7 @@ class TtyAttributes:
 class EditorSyntax:
     filetype: str
     flags: int
+    singleline_comment_start: str
     filematch: list[str] = field(default_factory=list)
 
 @dataclass
