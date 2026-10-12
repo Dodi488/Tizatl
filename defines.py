@@ -25,5 +25,9 @@ class EditorKey(Enum):
 
 class EditorHighlight(Enum):
     HL_NORMAL = 0
-    HL_NUMBER = 1
-    HL_MATCH = 2
+    HL_STRING = 1
+    HL_NUMBER = 2
+    HL_MATCH = 3
+
+HL_HIGHLIGHT_NUMBERS = (1<<0)
+HL_HIGHLIGHT_STRINGS = (1<<1)

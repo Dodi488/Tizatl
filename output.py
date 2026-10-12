@@ -34,7 +34,7 @@ def editor_draw_rows(ab: Abuf) -> None:
         if (filerow >= E.numrows):
             if (E.numrows == 0 and y == E.screenrows // 3):
                 welcome = f"Tizatl editor -- version {TIZATL_VERSION}"
-                #welcomelen = len(welcome) if (welcomelen > E.screencols): welcomelen = E.screencols
+                #welcomelen = len(welcome) if (welcomelen > E.screencols) else welcomelen = E.screencols
                 welcomelen = len(welcome)
                 if welcomelen > E.screencols:
                     welcomelen = E.screencols
@@ -56,7 +56,6 @@ def editor_draw_rows(ab: Abuf) -> None:
             if length > E.screencols: length = len(E.screencols)
             c = E.row[filerow].render[E.coloff:]
             hl = E.row[filerow].hl[E.coloff:]
-            #hl = E.row[filerow].hl
             current_color = -1
             for j in range(length):
                 if hl[j] == EditorHighlight.HL_NORMAL.value:
@@ -68,8 +67,6 @@ def editor_draw_rows(ab: Abuf) -> None:
                     color = editor_syntax_to_color(hl[j])
                     if color != current_color:
                         current_color = color
-                        # buf = bytearray(16) This is not necessary because we will store the return value of string.format(color) in clen.
-                        #buf = " " * 16
                         buf = "\x1b[{}m".format(color)
                         clen = len(buf)
                         ab_append(ab, buf, clen)
@@ -86,7 +83,7 @@ def editor_draw_status_bar(ab: Abuf) -> None:
     status = f"{E.filename[:20]} - {E.numrows} lines {"modified" if E.dirty else ""}"
     length = len(status)
 
-    rstatus = f"{E.cy + 1}/{E.numrows}"
+    rstatus = f"{E.syntax.filetype if E.syntax else "no ft"} | {E.cy + 1}/{E.numrows}"
     rlength = len(rstatus)
 
     if length > E.screencols: length = E.screencols

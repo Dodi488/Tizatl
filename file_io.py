@@ -5,6 +5,7 @@ from data import E, Erow
 from terminal import die
 from row_operations import editor_insert_row
 from output import editor_set_status_message
+from syntax_highlighting import editor_select_syntax_highlight
 
 sys.dont_write_bytecode = True
 
@@ -22,6 +23,8 @@ def editor_rows_to_string(blufen: int) -> str: # "".joind(blufen)?
 
 def editor_open(filename: str) -> None:
     E.filename = filename
+
+    editor_select_syntax_highlight()
 
     try:
         with open(filename, "r") as f:
@@ -41,6 +44,8 @@ def editor_save() -> None:
         if E.filename == "":
             editor_set_status_message("Save aborted")
             return
+
+        editor_select_syntax_highlight()
 
     length = 0
     buf = editor_rows_to_string(length)

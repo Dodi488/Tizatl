@@ -34,6 +34,7 @@ def realloc(b: bytearray, length: int) -> bytearray: # bytearray.resize()
     elif len(b) < length:
         return b + bytearray(length)
 
+# Structs
 @dataclass
 class TtyAttributes:
     iflag: int
@@ -43,6 +44,12 @@ class TtyAttributes:
     ispeed: int
     ospeed: int
     cc: list[str | int] = field(default_factory=list)
+
+@dataclass
+class EditorSyntax:
+    filetype: str
+    flags: int
+    filematch: list[str] = field(default_factory=list)
 
 @dataclass
 class Erow:
@@ -56,6 +63,7 @@ class Erow:
 @dataclass
 class EditConfig:
     orig_termios: TtyAttributes
+    syntax: EditorSyntax | None = None
     row: list[Erow] = field(default_factory=list)
     cx: int = 0
     cy: int = 0
@@ -78,4 +86,4 @@ class Winsize:
     ws_xpixel: int
     ws_ypixel: int
 
-E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)))
+E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO)), syntax=None)
