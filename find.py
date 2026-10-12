@@ -1,7 +1,7 @@
 import sys
 
 from data import E
-from defines import EditorKey
+from defines import EditorKey, EditorHighlight
 from row_operations import editor_row_rx_to_cx
 
 sys.dont_write_bytecode = True
@@ -9,8 +9,15 @@ sys.dont_write_bytecode = True
 last_match = -1
 direction = 1
 
+saved_hl_line = 0
+saved_hl = ""
+
 def editor_find_callback(query: str, key: bytes) -> None:
-    global last_match, direction
+    global last_match, direction, saved_hl_line, saved_hl
+
+    if saved_hl:
+        E.row[saved_hl_line].hl = saved_hl
+        saved_hl = []
 
     if key == b'\r' or key == '\x1b':
         last_match = -1
@@ -38,6 +45,10 @@ def editor_find_callback(query: str, key: bytes) -> None:
             E.cy = current
             E.cx = editor_row_rx_to_cx(row, match)
             E.rowoff = E.cy
+
+            saved_hl_line = current
+            saved_hl = list(row.hl)
+            row.hl[match : match + len(query)] = [EditorHighlight.HL_MATCH.value] * len(query)
             return
 
 def editor_find() -> None:
