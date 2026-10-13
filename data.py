@@ -8,11 +8,20 @@ sys.dont_write_bytecode = True
 
 # Helper functions
 # This one can be replace by importing urses.ascii.iscntrl()
-def iscntrl(char: bytes) -> bool: # We do this because we apply s.decode later so everything that comes here is a string.
-    if char in (b'\x1b[A', b'\x1b[B', b'\x1b[C', b'\x1b[D'):
-        return True
-    val = ord(char.decode("utf-8"))
+
+def iscntrl(char):
+    if isinstance(char, str):
+        val = int(ord(char)) 
+    else:
+        char = char.decode("utf-8") # In c we dont have to do this convertion.
+        val = char
     return (0 <= val <= 31) or (val == 127)
+
+#def iscntrl(char: bytes) -> bool: # We do this because we apply s.decode later so everything that comes here is a string.
+#    if char in (b'\x1b[A', b'\x1b[B', b'\x1b[C', b'\x1b[D'):
+#        return True
+#    val = ord(char.decode("utf-8"))
+#    return (0 <= val <= 31) or (val == 127)
 
 def perror(s: str): # Python automatically halts the program when it encounters and error, so this function and all instances of it are useless unless with a try/excpet.
     _, exc_value, _ = sys.exc_info()
@@ -48,7 +57,10 @@ class EditorSyntax:
     filetype: str
     flags: int
     singleline_comment_start: str
+    multiline_comment_start: str
+    multiline_comment_end: str
     filematch: list[str] = field(default_factory=list)
+    keywords: list[str] = field(default_factory=list)
 
 @dataclass
 class Erow:

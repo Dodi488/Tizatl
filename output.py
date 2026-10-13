@@ -4,7 +4,7 @@ from time import time
 
 from defines import STDOUT_FILENO, TIZATL_VERSION, EditorHighlight
 from syntax_highlighting import editor_syntax_to_color
-from data import E
+from data import E, iscntrl
 from append_buffer import Abuf, ab_append, ab_free#, ABUF_INIT
 from row_operations import editor_row_cx_to_rx
 
@@ -59,7 +59,16 @@ def editor_draw_rows(ab: Abuf) -> None:
             hl = E.row[filerow].hl[E.coloff:]
             current_color = -1
             for j in range(length):
-                if hl[j] == EditorHighlight.HL_NORMAL.value:
+                if iscntrl(c[j]): # Anyway this in uncecessary because my editor cant render binaries (BUG).
+                    sym = '@' + c[j] if (c[j] <= 26) else '?'
+                    ab_append(ab, "\x1b[7m", 4)
+                    ab_append(ab, sym, 1)
+                    ab_append(ab, "\x1b[m", 3)
+                    if current_color != -1:
+                        buf = "\x1b[{}m".format(curent_color)
+                        clen = len(buf)
+                        ab_append(ab, buf, clen)
+                elif hl[j] == EditorHighlight.HL_NORMAL.value:
                     if current_color != -1:
                         ab_append(ab, "\x1b[39m", 5)
                         current_color = -1

@@ -11,15 +11,25 @@ def is_separator(c: str) -> bool:
     return c.isspace() or c == '\0' or c in ",.()+-/*=~%<>[];"
 
 def editor_update_syntax(row: Erow) -> None:
+    prev_sep = True
+
     row.hl[:] = [EditorHighlight.HL_NORMAL.value] * row.rsize
 
     if E.syntax == None: return
 
+    keywords = E.syntax.keywords
+
     scs = E.syntax.singleline_comment_start
+    mcs = E.syntax.multiline_comment_start
+    mce = E.syntax.multiline_comment_end
+
     scs_len = len(scs) if scs else 0
+    mcs_len = len(mcs) if mcs else 0
+    mce_len = len(mce) if mce else 0
 
     prev_state = 1
     in_string = 0
+    in_comment = 0
 
     i = 0
     while i < row.rsize:
@@ -28,9 +38,28 @@ def editor_update_syntax(row: Erow) -> None:
 
         if scs_len and not in_string:
             #if not row.render[i][:scs_len] == scs[:scs_len]:
-            if row.render[i:i+scs_len] == scs:
+            if row.render[i : i + scs_len] == scs:
                 row.hl[i:] = [EditorHighlight.HL_COMMENT.value] * (row.rsize - i)
                 return
+
+        if mcs_len and mce_len and not in_string:
+            if in_comment:
+                row.hl[i] = EditorHighlight.HL_MLCOMMENT.value
+                if not row.render[i : i + mce_len] == mce:
+                    row.hl[i] = [EditorHighlight.HL_COMMENT.value] * mce_len
+                    i += mce_len
+                    in_comment = 0
+                    prev_sep = True
+                    continue
+                else:
+                    i += 1
+                    continue
+
+            elif row.render[i : i + mcs_len] == mcs:
+                row.hl[i] = [EditorHighlight.HL_COMMENT.value] * mcs_len
+                i += mcs_len
+                in_comment = True
+                continue
 
         if E.syntax.flags & HL_HIGHLIGHT_STRINGS:
             if in_string:
@@ -58,13 +87,40 @@ def editor_update_syntax(row: Erow) -> None:
                 prev_state = 0
                 continue
 
+        if prev_sep:
+            matched_keyword = False
+            for j in keywords:
+                #klen = len(keywords[j])
+                #klen = len(keywords)
+                klen = len(j)
+                kw2 = j.endswith('|')
+                #kw2 = keywords[klen - 1] == '|'
+                if kw2: klen -= 1
+
+                #if row.render[i : i + klen] == keywords and is_separator(row.render[i + klen]):
+                    #row.hl[i] = [EditorHighlight.HL_KEYWORD2.value if kw2 else EditorHighlight.HL_KEYWORD2.value] * klen
+                if row.render[i : i + klen] == j[:klen] and (i + klen >= row.rsize or is_separator(row.render[i + klen])):
+                    row.hl[i : i + klen] = [EditorHighlight.HL_KEYWORD2.value if kw2 else EditorHighlight.HL_KEYWORD1.value] * klen
+                    i += klen
+                    return
+
+            #if keywords != None:
+            if matched_keyword:
+                #prev_sep = 0
+                prev_sep = False
+                continue
+
         prev_state = is_separator(c)
         i += 1
 
 def editor_syntax_to_color(hl: int) -> int:
     match hl:
-        case EditorHighlight.HL_COMMENT.value:
+        case EditorHighlight.HL_COMMENT.value | EditorHighlight.HL_MLCOMMENT.value:
             return 36
+        case EditorHighlight.HL_KEYWORD1.value:
+            return 33
+        case EditorHighlight.HL_KEYWORD2.value:
+            return 32
         case EditorHighlight.HL_STRING.value:
             return 35
         case EditorHighlight.HL_NUMBER.value:
@@ -74,9 +130,9 @@ def editor_syntax_to_color(hl: int) -> int:
         case _:
             return 37
 
-#def editor_select_syntax_highlight() -> None:
-#    E.syntax = None
-#    if E.filename == "": return
+def editor_select_syntax_highlight() -> None:
+    E.syntax = None
+    if E.filename == "": return
 
 #    ext = E.filename.find('.')
 
@@ -95,10 +151,6 @@ def editor_syntax_to_color(hl: int) -> int:
 #                return
 
 #            i += 1
-
-def editor_select_syntax_highlight() -> None:
-    E.syntax = None
-    if E.filename == "": return
 
     for s in HLDB:
         for match_str in s.filematch:
