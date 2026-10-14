@@ -22,7 +22,9 @@ class EditorKey(Enum):
     DEL_KEY = b'\x1b[3~'
     END_KEY = b'\x1b[4~'
     PAGE_UP = b'\x1b[5~'
+    CONTROL_PAGE_UP = PAGE_UP #b'\x1b[5;5~'
     PAGE_DOWN = b'\x1b[6~'
+    CONTROL_PAGE_DOWN = PAGE_DOWN # b'\x1b[6;5~'
 
 class EditorHighlight(Enum):
     HL_NORMAL = 0

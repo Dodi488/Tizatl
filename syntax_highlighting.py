@@ -37,7 +37,6 @@ def editor_update_syntax(row: Erow) -> None:
         prev_hl = row.hl[i - 1] if i > 0 else EditorHighlight.HL_NORMAL.value
 
         if scs_len and not in_string and not in_comment:
-            #if not row.render[i][:scs_len] == scs[:scs_len]:
             if row.render[i : i + scs_len] == scs:
                 row.hl[i:] = [EditorHighlight.HL_COMMENT.value] * (row.rsize - i)
                 return
@@ -45,7 +44,6 @@ def editor_update_syntax(row: Erow) -> None:
         if mcs_len and mce_len and not in_string:
             if in_comment:
                 row.hl[i] = EditorHighlight.HL_MLCOMMENT.value
-                #if not row.render[i : i + mce_len] == mce:
                 if row.render[i : i + mce_len] == mce:
                     row.hl[i : i + mce_len] = [EditorHighlight.HL_MLCOMMENT.value] * mce_len
                     i += mce_len
@@ -91,23 +89,16 @@ def editor_update_syntax(row: Erow) -> None:
         if prev_sep:
             matched_keyword = False
             for j in keywords:
-                #klen = len(keywords[j])
-                #klen = len(keywords)
                 klen = len(j)
                 kw2 = j.endswith('|')
-                #kw2 = keywords[klen - 1] == '|'
                 if kw2: klen -= 1
 
-                #if row.render[i : i + klen] == keywords and is_separator(row.render[i + klen]):
-                    #row.hl[i] = [EditorHighlight.HL_KEYWORD2.value if kw2 else EditorHighlight.HL_KEYWORD2.value] * klen
                 if row.render[i : i + klen] == j[:klen] and (i + klen >= row.rsize or is_separator(row.render[i + klen])):
                     row.hl[i : i + klen] = [EditorHighlight.HL_KEYWORD2.value if kw2 else EditorHighlight.HL_KEYWORD1.value] * klen
                     i += klen
                     return
 
-            #if keywords != None:
             if matched_keyword:
-                #prev_sep = 0
                 prev_sep = False
                 continue
 
@@ -116,7 +107,7 @@ def editor_update_syntax(row: Erow) -> None:
 
     changed = (row.hl_open_comment != in_comment)
     row.hl_open_comment = in_comment
-    if changed and ((row.idx + 1) < E.numrows): editor_update_syntax(E.row[:row.idx + 1])
+    if changed and ((row.idx + 1) < E.numrows): editor_update_syntax(E.row[row.idx + 1])
 
 def editor_syntax_to_color(hl: int) -> int:
     match hl:

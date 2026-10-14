@@ -1,9 +1,4 @@
-#import os
 import sys
-#from dataclasses import dataclass, field, astuple, replace
-#import termios
-#import atexit
-#import errno
 
 sys.dont_write_bytecode = True
 
@@ -14,21 +9,6 @@ from data import E
 from file_io import editor_open
 
 def init_editor() -> None:
-    # We should probably define E here.
-    # We could not only not define defaults in our dataclasses and this would make sense.
-    # Python does not allow to initialize a datalclass and not put values (unless we have defaults or make the attributes optional).
-    #E.cx = 0
-    #E.cy = 0
-    #E.rx = 0
-    #E.rowoff = 0
-    #E.coloff = 0
-    #E.numrows = 0
-    #E.row = []
-    #E.filename = "New"
-    #E.statusmsg[0] = '\0' # Cant add something to a string using slicing, either change statusmsg to an array or concatenate '\0' to the beggining.
-    # E.statusmsg_time = 0
-    # E = EditConfig(orig_termios=TtyAttributes(*termios.tcgetattr(STDIN_FILENO))) This will cause a circular import error.
-
     try:
         get_window_size(E)
     except OSError:

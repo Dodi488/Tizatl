@@ -71,7 +71,7 @@ def editor_free_row(row: Erow) -> None: # This is not necessary in python.
 def editor_del_row(at: int) -> None:
     if at < 0 or at >= E.numrows: return
     del E.row[at]
-    for j in range(at, E.numrows): E.row[j].idx -= 1
+    for j in range(at, E.numrows - 1): E.row[j].idx -= 1
     E.numrows -= 1
     E.dirty = True
 

@@ -34,11 +34,11 @@ def editor_draw_rows(ab: Abuf) -> None:
         if (filerow >= E.numrows):
             if (E.numrows == 0 and y == E.screenrows // 3):
                 welcome = f"Tizatl editor -- version {TIZATL_VERSION}"
-                welcomelen = len(welcome) if welcomelen > E.screencols else E.screencols
+                #welcomelen = len(welcome) if welcomelen > E.screencols else E.screencols
                 #welcomelen = len(welcome) if (welcomelen > E.screencols) else welcomelen = E.screencols
-                #welcomelen = len(welcome)
-                #if welcomelen > E.screencols:
-                #    welcomelen = E.screencols
+                welcomelen = len(welcome)
+                if welcomelen > E.screencols:
+                    welcomelen = E.screencols
                 padding = (E.screencols - welcomelen) // 2
                 if padding:
                     ab_append(ab, "~", 1)
@@ -54,13 +54,15 @@ def editor_draw_rows(ab: Abuf) -> None:
         else:
             length = E.row[filerow].rsize - E.coloff
             if length < 0: length = 0
-            if length > E.screencols: length = len(E.screencols)
+            #if length > E.screencols: length = len(E.screencols)
+            if length > E.screencols: length = E.screencols
             c = E.row[filerow].render[E.coloff:]
             hl = E.row[filerow].hl[E.coloff:]
             current_color = -1
             for j in range(length):
                 if iscntrl(c[j]): # Anyway this in uncecessary because my editor cant render binaries (BUG).
-                    sym = '@' + c[j] if (c[j] <= 26) else '?'
+                    #sym = chr(ord('@')) + ord(c[j]) if ord(c[j]) <= 26 else '?'
+                    sym = chr(ord('@') + ord(c[j])) if ord(c[j]) <= 26 else '?'
                     ab_append(ab, "\x1b[7m", 4)
                     ab_append(ab, sym, 1)
                     ab_append(ab, "\x1b[m", 3)

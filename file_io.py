@@ -27,7 +27,7 @@ def editor_open(filename: str) -> None:
     editor_select_syntax_highlight()
 
     try:
-        with open(filename, "r") as f:
+        with open(filename, "r", errors="surrogateescape") as f:
             for line in f:
                 linelen = len(line)
                 while linelen > 0 and (line[linelen - 1] == '\n' or line[linelen - 1] == '\r'): linelen -= 1

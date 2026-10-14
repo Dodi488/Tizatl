@@ -87,6 +87,16 @@ def editor_read_key() -> bytes:
                         case b'6': return EditorKey.PAGE_DOWN.value
                         case b'7': return EditorKey.HOME_KEY.value
                         case b'8': return EditorKey.END_KEY.value
+
+                elif seq[2] == b';':
+                    print(seq)
+                    0[0] = 0
+                    match seq[1]:
+                        #case b'5': return EditorKey.CONTROL_PAGE_UP.value
+                        case b'5': return EditorKey.PAGE_UP.value
+                        #case b'6': return EditorKey.CONTROL_PAGE_DOWN.value
+                        case b'6': return EditorKey.PAGE_DOWN.value
+
             else:
                 match seq[1]:
                     case b'A': return EditorKey.MOVE_UP.value

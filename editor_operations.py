@@ -21,7 +21,6 @@ def editor_insert_new_line() -> None:
         editor_insert_row(E.cy + 1, tail, len(tail))
         row = E.row[E.cy]
         row.size = E.cx
-        #row.chars[row.size] = '\0'
         row.chars = row.chars[:E.cx]
         editor_update_row(row)
 
