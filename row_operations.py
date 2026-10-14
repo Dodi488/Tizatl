@@ -55,8 +55,9 @@ def editor_update_row(row: Erow) -> None:
 def editor_insert_row(at: int, s: str, length: int) -> None:
     if at < 0 or at > E.numrows: return
 
-    new_row = Erow(size=length, chars=s[:length], rsize=0, render="") # hl default is already a list so no need to define it here.
+    new_row = Erow(size=length, chars=s[:length], rsize=0, render="", idx=at, hl_open_comment=0) # hl default is already a list so no need to define it here.
     E.row.insert(at, new_row)
+    for j in range(at + 1, E.numrows): E.row[j].idx += 1
     editor_update_row(E.row[at])
 
     E.numrows += 1
@@ -70,6 +71,7 @@ def editor_free_row(row: Erow) -> None: # This is not necessary in python.
 def editor_del_row(at: int) -> None:
     if at < 0 or at >= E.numrows: return
     del E.row[at]
+    for j in range(at, E.numrows): E.row[j].idx -= 1
     E.numrows -= 1
     E.dirty = True
 

@@ -64,11 +64,12 @@ class EditorSyntax:
 
 @dataclass
 class Erow:
+    idx: int
     size: int
     rsize: int
     chars: str
     render: str
-    #hl: str
+    hl_open_comment: int
     hl: list[int] = field(default_factory=list)
 
 @dataclass
